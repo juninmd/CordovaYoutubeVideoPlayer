@@ -2,19 +2,24 @@ cordova.define("com.bunkerpalace.cordova.YoutubeVideoPlayer.YoutubeVideoPlayer",
 
 function YoutubeVideoPlayer() {}
 
-YoutubeVideoPlayer.prototype.openVideo = function(YTid) {
-	exec(function(result) {
-		console.log(result);
-	},
-	function(error) {
-		console.log(error);
-	},
-	"YoutubeVideoPlayer",
-	"openVideo",
-	[YTid]
+YoutubeVideoPlayer.prototype.openVideo = function(videoId, callback) {
+	exec(
+		function() {
+			if (callback) {
+				callback('closed');
+			}
+		},
+		function() {
+			if (callback) {
+				callback('error');
+			}
+		},
+		"YoutubeVideoPlayer",
+		"openVideo",
+		[videoId]
 	);
-}
+};
 
-var YoutubeVideoPlayer = new YoutubeVideoPlayer();
-module.exports = YoutubeVideoPlayer
+var youtubeVideoPlayer = new YoutubeVideoPlayer();
+module.exports = youtubeVideoPlayer;
 });

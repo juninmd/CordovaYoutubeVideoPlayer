@@ -43,7 +43,7 @@ public class YouTubeActivity extends YouTubeBaseActivity implements YouTubePlaye
         if (errorReason.isUserRecoverableError()) {
             errorReason.getErrorDialog(this, RECOVERY_REQUEST).show();
         } else {
-            String error = String.format("Error initializing YouTube player", errorReason.toString());
+            String error = String.format("Error initializing YouTube player: %s", errorReason.toString());
             Toast.makeText(this, error, Toast.LENGTH_LONG).show();
         }
     }
@@ -55,9 +55,8 @@ public class YouTubeActivity extends YouTubeBaseActivity implements YouTubePlaye
     }
 
     @Override
-    public void onError(
-            com.google.android.youtube.player.YouTubePlayer.ErrorReason arg0) {
-        updateLog("onError(): " + arg0.toString());
+    public void onError(YouTubePlayer.ErrorReason errorReason) {
+        Log.d("YouTubeActivity", "onError(): " + errorReason.toString());
         finish();
     }
 
@@ -72,8 +71,4 @@ public class YouTubeActivity extends YouTubeBaseActivity implements YouTubePlaye
 
     @Override
     public void onVideoStarted() {}
-
-    private void updateLog(String text){
-        Log.d("YouTubeActivity", text);
-    };
 }
