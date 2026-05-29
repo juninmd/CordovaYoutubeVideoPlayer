@@ -49,3 +49,23 @@ local.properties
 .classpath
 gen/
 .project
+
+# Dependencies
+node_modules/
+
+# Testing
+coverage/
+test-results/
+
+# Build output
+dist/
+*.tar.gz
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Environment
+.env
+.env.local
