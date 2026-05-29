@@ -1,4 +1,9 @@
-#Cordova YoutubeVideoPlayer Plugin
+# Cordova YoutubeVideoPlayer Plugin
+
+[![CI/CD Pipeline](https://github.com/juninmd/CordovaYoutubeVideoPlayer/actions/workflows/ci.yml/badge.svg)](https://github.com/juninmd/CordovaYoutubeVideoPlayer/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/juninmd/CordovaYoutubeVideoPlayer/branch/main/graph/badge.svg)](https://codecov.io/gh/juninmd/CordovaYoutubeVideoPlayer)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Cordova](https://img.shields.io/badge/Cordova-%3E%3D3.0.0-green.svg)](https://cordova.apache.org)
 
 **Play Youtube Videos in a native Video Player on Android &amp; iOS.**
 
@@ -17,13 +22,23 @@ https://developers.google.com/youtube/android/player/reference/com/google/androi
 Android with YouTube App Version 111662130 requires a workaround to resolve an App issue:
 https://code.google.com/p/gdata-issues/issues/detail?id=8244
 
-##Installation
+## Installation
 
 ```sh
 cordova plugin add https://github.com/juninmd/CordovaYoutubeVideoPlayer
 ```
 
-##Usage
+## Development Setup
+
+```sh
+git clone <repo-url>
+cd CordovaYoutubeVideoPlayer
+npm install
+npm test
+npm run lint
+```
+
+## Usage
 
 ```javascript
 YoutubeVideoPlayer.openVideo('YOUTUBE_VIDEO_ID', function(result) { console.log('YoutubeVideoPlayer result = ' + result); });
@@ -36,11 +51,23 @@ For Android 5.0+ you will need to add the following to config.xml
 ```
 with your own YouTube Key.
 
- For more information: https://developers.google.com/youtube/v3/getting-started
+For more information: https://developers.google.com/youtube/v3/getting-started
 
-The callback is called when the video window is closed.  (Work in Progress - should be working for IOS).
+The callback is called when the video window is closed. (Work in Progress - should be working for IOS).
 
-##Author
+## CI/CD Pipeline
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+- **Lint** - ESLint and Prettier code style checks
+- **Test** - Jest unit tests with minimum 80% coverage
+- **Security** - npm audit and dependency review
+- **Build** - Plugin artifact packaging
+- **Deploy** - Automated release creation on tag
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
+
+## Author
 
 **Adrien Glitchbone**
 
@@ -53,7 +80,7 @@ The callback is called when the video window is closed.  (Work in Progress - sho
 **trakout**
 + [https://github.com/trakout](https://github.com/trakout)
 
-##License
+## License
 
 CordovaYoutubeVideoPlayer is available under the MIT license. See the [LICENSE](LICENSE) file for more information.  
 XCDYouTubeKit is available under the MIT license.  

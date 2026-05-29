@@ -1,0 +1,5 @@
+platforms/
+plugins/org.apache.cordova.console/
+coverage/
+dist/
+node_modules/
