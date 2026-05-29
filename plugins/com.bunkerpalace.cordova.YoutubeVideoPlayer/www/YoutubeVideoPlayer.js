@@ -5,12 +5,12 @@ function YoutubeVideoPlayer() {}
 YoutubeVideoPlayer.prototype.openVideo = function(videoId, callback) {
 	exec(
 		function() {
-			if (callback) {
+			if (typeof callback === 'function') {
 				callback('closed');
 			}
 		},
 		function() {
-			if (callback) {
+			if (typeof callback === 'function') {
 				callback('error');
 			}
 		},
