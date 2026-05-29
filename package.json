@@ -1,15 +1,33 @@
 {
-	"name": "com.bunkerpalace.cordova.YoutubeVideoPlayer",
-	"version": "1.0.1",
-	"cordova": {
-		"id": "com.bunkerpalace.cordova.YoutubeVideoPlayer",
-		"platforms": [
-			"android",
-			"ios"
-		]
-	},
-	"engines": {
-		"cordovaDependencies": {
-		}
-	}
+  "name": "com.bunkerpalace.cordova.YoutubeVideoPlayer",
+  "version": "1.0.5",
+  "description": "Play Youtube Videos in a native Video Player on Android & iOS.",
+  "author": "Adrien Glitchbone - Bunker Palace SA",
+  "license": "MIT",
+  "keywords": [
+    "video",
+    "youtube",
+    "videoplayer",
+    "cordova",
+    "ecosystem:cordova"
+  ],
+  "type": "module",
+  "cordova": {
+    "id": "com.bunkerpalace.cordova.YoutubeVideoPlayer",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "engines": {
+    "cordovaDependencies": {}
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "clean": "rm -rf plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/www/YoutubeVideoPlayer.{js,d.ts,d.ts.map,js.map}"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
 }

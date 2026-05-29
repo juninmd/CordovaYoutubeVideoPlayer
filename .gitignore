@@ -49,3 +49,7 @@ local.properties
 .classpath
 gen/
 .project
+
+# TypeScript / Node
+node_modules/
+dist/

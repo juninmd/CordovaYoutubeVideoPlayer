@@ -1,14 +1,13 @@
-var app = {
-    initialize: function() {
+const app = {
+    initialize() {
         this.bindEvents();
     },
-    bindEvents: function() {
+    bindEvents() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
     },
-    onDeviceReady: function() {
-        
+    onDeviceReady() {
     },
-	playVideo: function() {
-		YoutubeVideoPlayer.openVideo('npjF032TDDQ', function(result) { console.log('YoutubeVideoPlayer result = ' + result); });
-	}
+    playVideo() {
+        YoutubeVideoPlayer.openVideo('npjF032TDDQ', result => console.log('YoutubeVideoPlayer result = ' + result));
+    },
 };

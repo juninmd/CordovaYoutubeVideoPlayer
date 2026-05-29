@@ -1,25 +1,20 @@
-var exec = require('cordova/exec');
-
-function YoutubeVideoPlayer() {}
-
-YoutubeVideoPlayer.prototype.openVideo = function(YTid, callback) {
-	exec(function(result) {
-		console.log(result);
-		if(callback){
-			callback('closed');
-		}
-	},
-	function(error) {
-		console.log(error);
-		if(callback){
-			callback('error');
-		}
-	},
-	"YoutubeVideoPlayer",
-	"openVideo",
-	[YTid]
-	);
+"use strict";
+const exec = require("cordova/exec");
+class YoutubeVideoPlayer {
+    openVideo(YTid, callback) {
+        return new Promise((resolve, reject) => {
+            exec((result) => {
+                console.log(result);
+                callback?.('closed');
+                resolve('closed');
+            }, (error) => {
+                console.error(error);
+                callback?.('error');
+                reject(new Error(error ?? 'Unknown error opening video'));
+            }, 'YoutubeVideoPlayer', 'openVideo', [YTid]);
+        });
+    }
 }
-
-var YoutubeVideoPlayer = new YoutubeVideoPlayer();
-module.exports = YoutubeVideoPlayer
+const youtubeVideoPlayer = new YoutubeVideoPlayer();
+module.exports = youtubeVideoPlayer;
+//# sourceMappingURL=YoutubeVideoPlayer.js.map
