@@ -1,4 +1,5 @@
 /* global YoutubeVideoPlayer */
+/* eslint-disable no-unused-vars */
 var app = {
     initialize: function () {
         this.bindEvents();

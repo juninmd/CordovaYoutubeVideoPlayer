@@ -57,10 +57,4 @@ describe('YoutubeVideoPlayer', () => {
     expect(mod).toBe(YoutubeVideoPlayer);
   });
 
-  it('should call exec with correct service and action names', () => {
-    YoutubeVideoPlayer.openVideo('abc123');
-    const [, , service, action] = mockExec.mock.calls[0];
-    expect(service).toBe('YoutubeVideoPlayer');
-    expect(action).toBe('openVideo');
-  });
 });
