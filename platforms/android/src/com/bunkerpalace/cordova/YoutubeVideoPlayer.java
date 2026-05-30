@@ -94,10 +94,7 @@ public class YoutubeVideoPlayer extends CordovaPlugin {
 				YouTubeActivity.class);
 		intent.putExtra("videoId", videoId);
 		
-		ConfigXmlParser parser = new ConfigXmlParser();
-		parser.parse(cordova.getActivity());
-		CordovaPreferences prefs = parser.getPreferences();
-		intent.putExtra("YouTubeApiId", prefs.getString("YouTubeDataApiKey", "YOUTUBE_API_KEY"));
+		intent.putExtra("YouTubeApiId", preferences.getString("YouTubeDataApiKey", "YOUTUBE_API_KEY"));
 		
 		return intent;
 	}
