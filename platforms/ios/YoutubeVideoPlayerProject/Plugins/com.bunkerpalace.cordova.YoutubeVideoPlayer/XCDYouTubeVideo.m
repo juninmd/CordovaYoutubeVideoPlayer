@@ -12,6 +12,9 @@ NSString *const XCDYouTubeVideoErrorDomain = @"XCDYouTubeVideoErrorDomain";
 NSString *const XCDYouTubeNoStreamVideoUserInfoKey = @"NoStreamVideo";
 NSString *const XCDYouTubeVideoQualityHTTPLiveStreaming = @"HTTPLiveStreaming";
 
+static NSRegularExpression *sHtmlTagRegex;
+static NSRegularExpression *sLineBreakRegex;
+
 NSDictionary *XCDDictionaryWithQueryString(NSString *string, NSStringEncoding encoding)
 {
 	NSMutableDictionary *dictionary = [NSMutableDictionary new];
@@ -37,16 +40,14 @@ static NSString *XCDURLEncodedStringUsingEncoding(NSString *string, NSStringEnco
 
 NSString *XCDQueryStringWithDictionary(NSDictionary *dictionary, NSStringEncoding encoding)
 {
-	NSArray *keys = [[dictionary allKeys] filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id evaluatedObject, NSDictionary *bindings) {
-		return [evaluatedObject isKindOfClass:[NSString class]];
-	}]];
-	
 	NSMutableString *query = [NSMutableString new];
-	for (NSString *key in [keys sortedArrayUsingSelector:@selector(compare:)])
+	for (id key in dictionary)
 	{
+		if (![key isKindOfClass:[NSString class]])
+			continue;
 		if (query.length > 0)
 			[query appendString:@"&"];
-		
+
 		[query appendString:XCDURLEncodedStringUsingEncoding(key, encoding)];
 		[query appendString:@"="];
 		[query appendString:XCDURLEncodedStringUsingEncoding([dictionary[key] description], encoding)];
@@ -56,58 +57,67 @@ NSString *XCDQueryStringWithDictionary(NSDictionary *dictionary, NSStringEncodin
 
 @implementation XCDYouTubeVideo
 
++ (void)initialize
+{
+	static dispatch_once_t once;
+	dispatch_once(&once, ^{
+		sHtmlTagRegex = [NSRegularExpression regularExpressionWithPattern:@"<[^>]+>" options:(NSRegularExpressionOptions)0 error:NULL];
+		sLineBreakRegex = [NSRegularExpression regularExpressionWithPattern:@"<br\\s*/?>|\\n" options:NSRegularExpressionCaseInsensitive error:NULL];
+	});
+}
+
 - (instancetype) initWithIdentifier:(NSString *)identifier info:(NSDictionary *)info playerScript:(XCDYouTubePlayerScript *)playerScript response:(NSURLResponse *)response error:(NSError * __autoreleasing *)error
 {
 	if (!(self = [super init]))
 		return nil;
-	
+
 	_identifier = identifier;
 
 	NSString *streamMap = info[@"url_encoded_fmt_stream_map"];
 	NSString *httpLiveStream = info[@"hlsvp"];
 	NSString *adaptiveFormats = info[@"adaptive_fmts"];
-	
+
 	NSMutableDictionary *userInfo = response.URL ? [@{ NSURLErrorKey: response.URL } mutableCopy] : [NSMutableDictionary new];
-	
+
 	if (streamMap.length > 0 || httpLiveStream.length > 0)
 	{
 		NSMutableArray *streamQueries = [[streamMap componentsSeparatedByString:@","] mutableCopy];
 		[streamQueries addObjectsFromArray:[adaptiveFormats componentsSeparatedByString:@","]];
-		
+
 		_title = info[@"title"];
 		_duration = [info[@"length_seconds"] doubleValue];
-		
+
 		NSString *smallThumbnail = info[@"thumbnail_url"] ?: info[@"iurl"];
 		NSString *mediumThumbnail = info[@"iurlsd"] ?: info[@"iurlhq"] ?: info[@"iurlmq"];
 		NSString *largeThumbnail = info[@"iurlmaxres"];
 		_smallThumbnailURL = smallThumbnail ? [NSURL URLWithString:smallThumbnail] : nil;
 		_mediumThumbnailURL = mediumThumbnail ? [NSURL URLWithString:mediumThumbnail] : nil;
 		_largeThumbnailURL = largeThumbnail ? [NSURL URLWithString:largeThumbnail] : nil;
-		
+
 		NSString *useCipherSignature = info[@"use_cipher_signature"];
 		if ([useCipherSignature boolValue] && !playerScript)
 		{
 			userInfo[XCDYouTubeNoStreamVideoUserInfoKey] = self;
 			if (error)
 				*error = [NSError errorWithDomain:XCDYouTubeVideoErrorDomain code:XCDYouTubeErrorUseCipherSignature userInfo:userInfo];
-			
+
 			return nil;
 		}
-		
+
 		NSMutableDictionary *streamURLs = [NSMutableDictionary new];
-		
+
 		if (httpLiveStream)
 			streamURLs[XCDYouTubeVideoQualityHTTPLiveStreaming] = [NSURL URLWithString:httpLiveStream];
-		
+
 		for (NSString *streamQuery in streamQueries)
 		{
 			NSDictionary *stream = XCDDictionaryWithQueryString(streamQuery, NSUTF8StringEncoding);
-			
+
 			NSString *scrambledSignature = stream[@"s"];
 			NSString *signature = [playerScript unscrambleSignature:scrambledSignature];
 			if (playerScript && !signature)
 				continue;
-			
+
 			NSString *urlString = stream[@"url"];
 			NSString *itag = stream[@"itag"];
 			if (urlString && itag)
@@ -115,20 +125,20 @@ NSString *XCDQueryStringWithDictionary(NSDictionary *dictionary, NSStringEncodin
 				NSURL *streamURL = [NSURL URLWithString:urlString];
 				if (signature)
 					streamURL = [NSURL URLWithString:[NSString stringWithFormat:@"%@&signature=%@", urlString, [signature stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-				
+
 				streamURLs[@([itag integerValue])] = streamURL;
 			}
 		}
 		_streamURLs = [streamURLs copy];
-		
+
 		if (_streamURLs.count == 0)
 		{
 			if (error)
 				*error = [NSError errorWithDomain:XCDYouTubeVideoErrorDomain code:XCDYouTubeErrorNoStreamAvailable userInfo:userInfo];
-			
+
 			return nil;
 		}
-		
+
 		return self;
 	}
 	else
@@ -138,15 +148,11 @@ NSString *XCDQueryStringWithDictionary(NSDictionary *dictionary, NSStringEncodin
 			NSString *reason = info[@"reason"];
 			if (reason)
 			{
-				reason = [reason stringByReplacingOccurrencesOfString:@"<br\\s*/?>" withString:@" " options:NSRegularExpressionSearch range:NSMakeRange(0, reason.length)];
-				reason = [reason stringByReplacingOccurrencesOfString:@"\n" withString:@" " options:(NSStringCompareOptions)0 range:NSMakeRange(0, reason.length)];
-				NSRange range;
-				while ((range = [reason rangeOfString:@"<[^>]+>" options:NSRegularExpressionSearch]).location != NSNotFound)
-					reason = [reason stringByReplacingCharactersInRange:range withString:@""];
-				
+				reason = [sLineBreakRegex stringByReplacingMatchesInString:reason options:(NSMatchingOptions)0 range:NSMakeRange(0, reason.length) withTemplate:@" "];
+				reason = [sHtmlTagRegex stringByReplacingMatchesInString:reason options:(NSMatchingOptions)0 range:NSMakeRange(0, reason.length) withTemplate:@""];
 				userInfo[NSLocalizedDescriptionKey] = reason;
 			}
-			
+
 			NSString *errorcode = info[@"errorcode"];
 			NSInteger code = errorcode ? [errorcode integerValue] : XCDYouTubeErrorNoStreamAvailable;
 			*error = [NSError errorWithDomain:XCDYouTubeVideoErrorDomain code:code userInfo:userInfo];
@@ -157,15 +163,23 @@ NSString *XCDQueryStringWithDictionary(NSDictionary *dictionary, NSStringEncodin
 
 - (void) mergeVideo:(XCDYouTubeVideo *)video
 {
-	unsigned int count;
-	objc_property_t *properties = class_copyPropertyList(self.class, &count);
-	for (unsigned int i = 0; i < count; i++)
+	static NSArray *sMergeProperties;
+	static dispatch_once_t once;
+	dispatch_once(&once, ^{
+		unsigned int count;
+		objc_property_t *properties = class_copyPropertyList(self.class, &count);
+		NSMutableArray *names = [NSMutableArray arrayWithCapacity:count];
+		for (unsigned int i = 0; i < count; i++)
+			[names addObject:@(property_getName(properties[i]))];
+		free(properties);
+		sMergeProperties = [names copy];
+	});
+
+	for (NSString *propertyName in sMergeProperties)
 	{
-		NSString *propertyName = @(property_getName(properties[i]));
 		if (![self valueForKey:propertyName])
 			[self setValue:[video valueForKey:propertyName] forKeyPath:propertyName];
 	}
-	free(properties);
 }
 
 #pragma mark - NSObject

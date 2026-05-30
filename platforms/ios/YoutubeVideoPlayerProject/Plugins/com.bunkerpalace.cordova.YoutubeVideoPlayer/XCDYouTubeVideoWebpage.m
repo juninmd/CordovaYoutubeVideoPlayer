@@ -4,6 +4,8 @@
 
 #import "XCDYouTubeVideoWebpage.h"
 
+static NSRegularExpression *sPlayerConfigRegex;
+
 @interface XCDYouTubeVideoWebpage ()
 @property (nonatomic, strong) NSData *data;
 @property (nonatomic, strong) NSURLResponse *response;
@@ -16,14 +18,22 @@
 	NSURL *_javaScriptPlayerURL;
 }
 
++ (void)initialize
+{
+	static dispatch_once_t once;
+	dispatch_once(&once, ^{
+		sPlayerConfigRegex = [NSRegularExpression regularExpressionWithPattern:@"ytplayer.config\\s*=\\s*(\\{.*?\\});" options:NSRegularExpressionCaseInsensitive error:NULL];
+	});
+}
+
 - (instancetype) initWithData:(NSData *)data response:(NSURLResponse *)response
 {
 	if (!(self = [super init]))
 		return nil;
-	
+
 	_data = data;
 	_response = response;
-	
+
 	return self;
 }
 
@@ -36,8 +46,7 @@
 		__block NSDictionary *playerConfigurationDictionary;
 		CFStringEncoding encoding = CFStringConvertIANACharSetNameToEncoding((__bridge CFStringRef)self.response.textEncodingName ?: CFSTR(""));
 		NSString *html = CFBridgingRelease(CFStringCreateWithBytes(kCFAllocatorDefault, [self.data bytes], (CFIndex)[self.data length], encoding != kCFStringEncodingInvalidId ? encoding : kCFStringEncodingISOLatin1, false));
-		NSRegularExpression *playerConfigRegularExpression = [NSRegularExpression regularExpressionWithPattern:@"ytplayer.config\\s*=\\s*(\\{.*?\\});" options:NSRegularExpressionCaseInsensitive error:NULL];
-		[playerConfigRegularExpression enumerateMatchesInString:html options:(NSMatchingOptions)0 range:NSMakeRange(0, html.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
+		[sPlayerConfigRegex enumerateMatchesInString:html options:(NSMatchingOptions)0 range:NSMakeRange(0, html.length) usingBlock:^(NSTextCheckingResult *result, NSMatchingFlags flags, BOOL *stop) {
 			NSString *configString = [html substringWithRange:[result rangeAtIndex:1]];
 			NSDictionary *playerConfiguration = [NSJSONSerialization JSONObjectWithData:[configString dataUsingEncoding:NSUTF8StringEncoding] options:(NSJSONReadingOptions)0 error:NULL];
 			if ([playerConfiguration isKindOfClass:[NSDictionary class]])
@@ -79,7 +88,7 @@
 			NSString *javaScriptPlayerURLString = jsAssets;
 			if ([jsAssets hasPrefix:@"//"])
 				javaScriptPlayerURLString = [@"https:" stringByAppendingString:jsAssets];
-			
+
 			_javaScriptPlayerURL = [NSURL URLWithString:javaScriptPlayerURLString];
 		}
 	}

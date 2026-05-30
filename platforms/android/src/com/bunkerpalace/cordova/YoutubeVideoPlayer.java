@@ -16,8 +16,15 @@ import android.util.Log;
 
 public class YoutubeVideoPlayer extends CordovaPlugin {
 
+	private static final int REQUEST_CODE = 242;
+
 	private CallbackContext callbackContext;
 	private CordovaPreferences preferences;
+
+	private Boolean canResolvePlayVideoIntent;
+	private Boolean canResolvePlayVideoIntentWithOptions;
+	private Boolean isLollipopOrNewer;
+	private String youTubeVersion;
 
 	@Override
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -26,19 +33,19 @@ public class YoutubeVideoPlayer extends CordovaPlugin {
 	}
 
 	@Override
-     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
- 		
-		if(action.equals("openVideo")) {
+	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+		if (action.equals("openVideo")) {
 			String videoId = args.getString(0);
-         	this.openVideo(videoId);
+			this.openVideo(videoId);
 			this.callbackContext = callbackContext;
-         	return true;
-         }
- 	return false;
- 	}
+			return true;
+		}
+		return false;
+	}
 
+	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		if (requestCode == 242) {
+		if (requestCode == REQUEST_CODE) {
 			if (resultCode == this.cordova.getActivity().RESULT_OK) {
 				this.callbackContext.success();
 			} else {
@@ -49,73 +56,74 @@ public class YoutubeVideoPlayer extends CordovaPlugin {
 
 	private void openVideo(String videoId) {
 		Intent intent = createYoutubeIntent(videoId);
-		cordova.startActivityForResult(this, intent, 242);
+		cordova.startActivityForResult(this, intent, REQUEST_CODE);
 	}
 
 	private Intent createYoutubeIntent(String videoId) {
-		// For devices running Lollipop or newer, use YouTube Intents
 		if (isLollipopOrNewer()) {
 			return createLollipopYouTubeIntent(videoId);
 		}
-		
-		// For older devices, use the legacy YouTube player
 		return createLegacyYouTubeIntent(videoId);
 	}
 
-	/**
-	 * Creates a YouTube intent for devices running Lollipop or newer
-	 */
 	private Intent createLollipopYouTubeIntent(String videoId) {
-		Context cordovaContext = cordova.getActivity();
-		String version = YouTubeIntents.getInstalledYouTubeVersionName(cordovaContext);
-		
-		// Check for specific YouTube app version that needs special handling
-		if (hasProblematicYouTubeVersion(version) && YouTubeIntents.canResolvePlayVideoIntent(cordovaContext)) {
-			return YouTubeIntents.createPlayVideoIntent(cordovaContext, videoId);
+		Context ctx = cordova.getActivity();
+
+		if (hasProblematicYouTubeVersion() && canResolvePlayVideoIntent(ctx)) {
+			return YouTubeIntents.createPlayVideoIntent(ctx, videoId);
 		}
-		
-		// Try to use YouTube intents with options
-		if (YouTubeIntents.canResolvePlayVideoIntentWithOptions(cordovaContext)) {
-			return YouTubeIntents.createPlayVideoIntentWithOptions(cordovaContext, videoId, true, true);
+
+		if (canResolvePlayVideoIntentWithOptions(ctx)) {
+			return YouTubeIntents.createPlayVideoIntentWithOptions(ctx, videoId, true, true);
 		}
-		
-		// Fall back to custom YouTube activity with API key
+
 		return createCustomYouTubeIntent(videoId);
 	}
 
-	/**
-	 * Checks if the YouTube app version is known to have issues
-	 */
-	private boolean hasProblematicYouTubeVersion(String version) {
+	private boolean hasProblematicYouTubeVersion() {
+		String version = getYouTubeVersion();
 		return version != null && version.startsWith("11.16");
 	}
 
-	/**
-	 * Creates a custom YouTube intent using our own YouTubeActivity
-	 */
+	private String getYouTubeVersion() {
+		if (youTubeVersion == null) {
+			youTubeVersion = YouTubeIntents.getInstalledYouTubeVersionName(cordova.getActivity());
+		}
+		return youTubeVersion;
+	}
+
+	private boolean canResolvePlayVideoIntent(Context ctx) {
+		if (canResolvePlayVideoIntent == null) {
+			canResolvePlayVideoIntent = YouTubeIntents.canResolvePlayVideoIntent(ctx);
+		}
+		return canResolvePlayVideoIntent;
+	}
+
+	private boolean canResolvePlayVideoIntentWithOptions(Context ctx) {
+		if (canResolvePlayVideoIntentWithOptions == null) {
+			canResolvePlayVideoIntentWithOptions = YouTubeIntents.canResolvePlayVideoIntentWithOptions(ctx);
+		}
+		return canResolvePlayVideoIntentWithOptions;
+	}
+
 	private Intent createCustomYouTubeIntent(String videoId) {
-		Intent intent = new Intent(Intent.ACTION_VIEW, 
-				Uri.parse("http://www.youtube.com/watch?v=" + videoId), 
-				cordova.getActivity(), 
+		Intent intent = new Intent(Intent.ACTION_VIEW,
+				Uri.parse("http://www.youtube.com/watch?v=" + videoId),
+				cordova.getActivity(),
 				YouTubeActivity.class);
 		intent.putExtra("videoId", videoId);
-		
 		intent.putExtra("YouTubeApiId", preferences.getString("YouTubeDataApiKey", "YOUTUBE_API_KEY"));
-		
 		return intent;
 	}
 
-	/**
-	 * Creates a YouTube intent for older devices (pre-Lollipop)
-	 */
 	private Intent createLegacyYouTubeIntent(String videoId) {
 		return new Intent(null, Uri.parse("ytv://" + videoId), cordova.getActivity(), OpenYouTubePlayerActivity.class);
 	}
 
-	/**
-	 * Checks if the device is running Lollipop or newer
-	 */
 	private boolean isLollipopOrNewer() {
-		return Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP;
+		if (isLollipopOrNewer == null) {
+			isLollipopOrNewer = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+		}
+		return isLollipopOrNewer;
 	}
 }
