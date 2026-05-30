@@ -2,16 +2,12 @@ cordova.define("com.bunkerpalace.cordova.YoutubeVideoPlayer.YoutubeVideoPlayer",
 
 function YoutubeVideoPlayer() {}
 
-YoutubeVideoPlayer.prototype.openVideo = function(YTid) {
-	exec(function(result) {
-		console.log(result);
-	},
-	function(error) {
-		console.log(error);
-	},
-	"YoutubeVideoPlayer",
-	"openVideo",
-	[YTid]
+YoutubeVideoPlayer.prototype.openVideo = function(YTid, successCallback, errorCallback) {
+	exec(successCallback || function(result) { console.log(result); },
+	     errorCallback || function(error) { console.log(error); },
+	     "YoutubeVideoPlayer",
+	     "openVideo",
+	     [YTid]
 	);
 }
 

@@ -1,10 +1,9 @@
 package com.bunkerpalace.cordova;
 
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.ConfigXmlParser;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaPreferences;
-import org.apache.cordova.PluginResult;
+import org.apache.cordova.CordovaInterface;
 import org.json.JSONArray;
 import org.json.JSONException;
 import android.content.Context;
@@ -18,18 +17,25 @@ import android.util.Log;
 public class YoutubeVideoPlayer extends CordovaPlugin {
 
 	private CallbackContext callbackContext;
+	private CordovaPreferences preferences;
 
 	@Override
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-		
-		if(action.equals("openVideo")) {
-			String url = args.getString(0);
-        	this.openVideo(url);
-			this.callbackContext = callbackContext;
-        	return true;
-        }
-		return false;
+	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+		super.initialize(cordova, webView);
+		this.preferences = cordova.getActivity().getPreferences();
 	}
+
+	@Override
+     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+ 		
+		if(action.equals("openVideo")) {
+			String videoId = args.getString(0);
+         	this.openVideo(videoId);
+			this.callbackContext = callbackContext;
+         	return true;
+         }
+ 	return false;
+ 	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if (requestCode == 242) {
