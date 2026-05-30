@@ -1,25 +1,18 @@
 var exec = require('cordova/exec');
 
-function YoutubeVideoPlayer() {}
-
-YoutubeVideoPlayer.prototype.openVideo = function (YTid, callback) {
-    exec(
-        function (result) {
-            console.log(result);
-            if (typeof callback === 'function') {
-                callback('closed');
-            }
-        },
-        function (error) {
-            console.log(error);
-            if (typeof callback === 'function') {
-                callback('error');
-            }
-        },
-        'YoutubeVideoPlayer',
-        'openVideo',
-        [YTid]
-    );
+module.exports = {
+    openVideo: function (YTid, callback) {
+        var cb = typeof callback === 'function' ? callback : null;
+        exec(
+            function () {
+                cb && cb('closed');
+            },
+            function () {
+                cb && cb('error');
+            },
+            'YoutubeVideoPlayer',
+            'openVideo',
+            [YTid]
+        );
+    },
 };
-
-module.exports = new YoutubeVideoPlayer();
