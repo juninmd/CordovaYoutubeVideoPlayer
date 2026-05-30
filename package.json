@@ -13,7 +13,7 @@
     "cordovaDependencies": {}
   },
   "scripts": {
-    "test": "jest --config=jest.config.cjs --coverage",
+    "test": "jest --coverage",
     "lint": "eslint \"plugins/**/www/*.{js,ts}\" \"www/**/*.{js,ts}\"",
     "format": "prettier --check \"plugins/**/www/*.{js,ts}\" \"www/**/*.{js,ts}\"",
     "format:fix": "prettier --write \"plugins/**/www/*.{js,ts}\" \"www/**/*.{js,ts}\"",
