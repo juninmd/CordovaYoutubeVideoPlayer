@@ -8,7 +8,7 @@ describe('YoutubeVideoPlayer', () => {
     jest.resetModules();
     mockExec.mockClear();
     // Dynamically import the module to get fresh instance
-    YoutubeVideoPlayer = require('../plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/www/YoutubeVideoPlayer').default;
+    YoutubeVideoPlayer = require('../plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/www/YoutubeVideoPlayer');
   });
 
   it('should export an object with openVideo method', () => {
@@ -54,7 +54,7 @@ describe('YoutubeVideoPlayer', () => {
   });
 
   it('should be a singleton instance', () => {
-    const mod = require('../plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/www/YoutubeVideoPlayer').default;
+    const mod = require('../plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/www/YoutubeVideoPlayer');
     expect(mod).toBe(YoutubeVideoPlayer);
   });
 
