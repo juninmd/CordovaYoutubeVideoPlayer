@@ -186,6 +186,8 @@ static const NSUInteger kEventLabelCount = 3;
 - (void) finish
 {
 	self.isExecuting = NO;
+	[self.session finishTasksAndInvalidate];
+	self.session = nil;
 	self.isFinished = YES;
 }
 
