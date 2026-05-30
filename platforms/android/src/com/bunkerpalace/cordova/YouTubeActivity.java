@@ -36,8 +36,14 @@ public class YouTubeActivity extends YouTubeBaseActivity implements YouTubePlaye
         
         // Extract video ID and API key from intent
         Intent intent = getIntent();
-        videoId = intent.getStringExtra("videoId");
-        apiKey = intent.getStringExtra("YouTubeApiId");
+        videoId = intent != null ? intent.getStringExtra("videoId") : null;
+        apiKey = intent != null ? intent.getStringExtra("YouTubeApiId") : null;
+
+        if (videoId == null || videoId.isEmpty() || apiKey == null || apiKey.isEmpty()) {
+            Toast.makeText(this, "Invalid video ID or API key", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
         
         // Initialize YouTube player view
         youTubeView = new YouTubePlayerView(this);
