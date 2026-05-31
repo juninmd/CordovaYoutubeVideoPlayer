@@ -14,7 +14,7 @@
 {
     NSString* videoID = [command.arguments objectAtIndex:0];
 
-    if (videoID != nil) {
+    if ([videoID isKindOfClass:[NSString class]]) {
         XCDYouTubeVideoPlayerViewController *videoPlayerViewController = [[XCDYouTubeVideoPlayerViewController alloc] initWithVideoIdentifier:videoID];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(moviePlayerPlaybackDidFinish:) name:MPMoviePlayerPlaybackDidFinishNotification object:videoPlayerViewController.moviePlayer];
 
