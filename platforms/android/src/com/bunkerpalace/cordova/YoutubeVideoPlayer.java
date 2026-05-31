@@ -90,7 +90,7 @@ public class YoutubeVideoPlayer extends CordovaPlugin {
 
 	private String getYouTubeVersion() {
 		if (youTubeVersion == null) {
-			youTubeVersion = YouTubeIntents.getInstalledYouTubeVersionName(cordova.getActivity());
+   youTubeVersion = YouTubeIntents.getInstalledYouTubeVersionName(cordova.getActivity());
 		}
 		return youTubeVersion;
 	}
