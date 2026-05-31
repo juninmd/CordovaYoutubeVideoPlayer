@@ -1,18 +1,20 @@
 package com.bunkerpalace.cordova;
 
 import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaPreferences;
-import org.apache.cordova.CordovaInterface;
+import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
+
 import com.google.android.youtube.player.YouTubeIntents;
 import com.keyes.youtube.OpenYouTubePlayerActivity;
-import android.os.Build;
-import android.util.Log;
 
 public class YoutubeVideoPlayer extends CordovaPlugin {
 
@@ -34,13 +36,13 @@ public class YoutubeVideoPlayer extends CordovaPlugin {
 
 	@Override
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
-		if (action.equals("openVideo")) {
-			String videoId = args.getString(0);
-			this.openVideo(videoId);
-			this.callbackContext = callbackContext;
-			return true;
+		if (!action.equals("openVideo")) {
+			return false;
 		}
-		return false;
+		String videoId = args.getString(0);
+		this.openVideo(videoId);
+		this.callbackContext = callbackContext;
+		return true;
 	}
 
 	@Override
