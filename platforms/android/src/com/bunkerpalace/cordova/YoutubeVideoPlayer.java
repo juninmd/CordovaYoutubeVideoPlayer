@@ -19,7 +19,8 @@ public class YoutubeVideoPlayer extends CordovaPlugin {
 	private static final int REQUEST_CODE = 242;
 
 	private CallbackContext callbackContext;
-	private CordovaPreferences preferences;
+	private Context cachedContext;
+	private String cachedApiKey;
 
 	private Boolean canResolvePlayVideoIntent;
 	private Boolean canResolvePlayVideoIntentWithOptions;
@@ -29,7 +30,9 @@ public class YoutubeVideoPlayer extends CordovaPlugin {
 	@Override
 	public void initialize(CordovaInterface cordova, CordovaWebView webView) {
 		super.initialize(cordova, webView);
-		this.preferences = cordova.getActivity().getPreferences();
+		this.cachedContext = cordova.getActivity();
+		CordovaPreferences preferences = cordova.getActivity().getPreferences();
+		this.cachedApiKey = preferences.getString("YouTubeDataApiKey", "YOUTUBE_API_KEY");
 	}
 
 	@Override
@@ -56,7 +59,7 @@ public class YoutubeVideoPlayer extends CordovaPlugin {
 
 	private void openVideo(String videoId) {
 		Intent intent = createYoutubeIntent(videoId);
-		cordova.startActivityForResult(this, intent, REQUEST_CODE);
+		this.cordova.startActivityForResult(this, intent, REQUEST_CODE);
 	}
 
 	private Intent createYoutubeIntent(String videoId) {
@@ -67,7 +70,7 @@ public class YoutubeVideoPlayer extends CordovaPlugin {
 	}
 
 	private Intent createLollipopYouTubeIntent(String videoId) {
-		Context ctx = cordova.getActivity();
+		Context ctx = this.cachedContext;
 
 		if (hasProblematicYouTubeVersion() && canResolvePlayVideoIntent(ctx)) {
 			return YouTubeIntents.createPlayVideoIntent(ctx, videoId);
@@ -109,15 +112,15 @@ public class YoutubeVideoPlayer extends CordovaPlugin {
 	private Intent createCustomYouTubeIntent(String videoId) {
 		Intent intent = new Intent(Intent.ACTION_VIEW,
 				Uri.parse("http://www.youtube.com/watch?v=" + videoId),
-				cordova.getActivity(),
+				this.cachedContext,
 				YouTubeActivity.class);
 		intent.putExtra("videoId", videoId);
-		intent.putExtra("YouTubeApiId", preferences.getString("YouTubeDataApiKey", "YOUTUBE_API_KEY"));
+		intent.putExtra("YouTubeApiId", this.cachedApiKey);
 		return intent;
 	}
 
 	private Intent createLegacyYouTubeIntent(String videoId) {
-		return new Intent(null, Uri.parse("ytv://" + videoId), cordova.getActivity(), OpenYouTubePlayerActivity.class);
+		return new Intent(null, Uri.parse("ytv://" + videoId), this.cachedContext, OpenYouTubePlayerActivity.class);
 	}
 
 	private boolean isLollipopOrNewer() {
