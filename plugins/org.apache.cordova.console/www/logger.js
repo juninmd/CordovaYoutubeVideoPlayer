@@ -40,7 +40,7 @@
 //
 //------------------------------------------------------------------------------
 
-const logger: any = exports;
+const logger = exports;
 
 var exec    = require('cordova/exec');
 var utils   = require('cordova/utils');
