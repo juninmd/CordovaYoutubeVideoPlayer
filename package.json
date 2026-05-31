@@ -1,6 +1,7 @@
 {
   "name": "com.bunkerpalace.cordova.YoutubeVideoPlayer",
   "version": "1.0.5",
+  "type": "module",
   "description": "Play Youtube Videos in a native Video Player on Android & iOS.",
   "cordova": {
     "id": "com.bunkerpalace.cordova.YoutubeVideoPlayer",
@@ -14,9 +15,9 @@
   },
   "scripts": {
     "test": "jest --coverage",
-    "lint": "eslint \"plugins/**/www/*.{js,ts}\" \"www/**/*.{js,ts}\"",
-    "format": "prettier --check \"plugins/**/www/*.{js,ts}\" \"www/**/*.{js,ts}\"",
-    "format:fix": "prettier --write \"plugins/**/www/*.{js,ts}\" \"www/**/*.{js,ts}\"",
+    "lint": "eslint \"plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/**/*.ts\" \"www/**/*.ts\" \"test/**/*.ts\"",
+    "format": "prettier --check \"plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/**/*.ts\" \"www/**/*.ts\" \"test/**/*.ts\"",
+    "format:fix": "prettier --write \"plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/**/*.ts\" \"www/**/*.ts\" \"test/**/*.ts\"",
     "build": "tsc"
   },
   "devDependencies": {

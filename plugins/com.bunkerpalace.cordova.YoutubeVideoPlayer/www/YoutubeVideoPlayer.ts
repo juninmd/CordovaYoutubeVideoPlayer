@@ -1,15 +1,19 @@
 import exec from 'cordova/exec';
 
-export default {
-  openVideo: (YTid: string): Promise<string> => {
-    return new Promise((resolve, reject) => {
+export type VideoResult = 'closed' | 'error';
+
+const YoutubeVideoPlayer = {
+  openVideo(videoId: string): Promise<VideoResult> {
+    return new Promise<VideoResult>((resolve, reject) => {
       exec(
-        () => resolve('closed'),
-        () => reject('error'),
+        (_result: unknown) => resolve('closed'),
+        (_error: unknown) => reject('error'),
         'YoutubeVideoPlayer',
         'openVideo',
-        [YTid]
+        [videoId]
       );
     });
   },
 };
+
+export default YoutubeVideoPlayer;

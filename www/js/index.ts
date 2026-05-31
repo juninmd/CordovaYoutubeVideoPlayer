@@ -1,21 +1,25 @@
+import type { VideoResult } from '../../plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/www/YoutubeVideoPlayer';
+
 declare const YoutubeVideoPlayer: {
-    openVideo: (videoId: string, callback: (result: string) => void) => void;
+  openVideo: (videoId: string) => Promise<VideoResult>;
 };
 
 const app = {
-    initialize: () => {
-        app.bindEvents();
-    },
-    bindEvents: () => {
-        document.addEventListener('deviceready', app.onDeviceReady, false);
-    },
-    onDeviceReady: () => {},
-    playVideo: () => {
-        YoutubeVideoPlayer.openVideo('npjF032TDDQ', (result: string) => {
-            console.log(`YoutubeVideoPlayer result = ${result}`);
-        });
-    },
+  initialize: (): void => {
+    app.bindEvents();
+  },
+  bindEvents: (): void => {
+    document.addEventListener('deviceready', app.onDeviceReady, false);
+  },
+  onDeviceReady: (): void => {},
+  async playVideo(): Promise<void> {
+    try {
+      const result = await YoutubeVideoPlayer.openVideo('npjF032TDDQ');
+      console.log(`YoutubeVideoPlayer result = ${result}`);
+    } catch (error) {
+      console.error('YoutubeVideoPlayer error:', error);
+    }
+  },
 };
 
-// Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', app.initialize);

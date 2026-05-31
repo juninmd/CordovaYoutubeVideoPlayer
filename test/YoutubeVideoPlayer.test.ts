@@ -1,14 +1,16 @@
-let YoutubeVideoPlayer: any;
-const mockExec = jest.fn();
+import type YoutubeVideoPlayerType from '../plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/www/YoutubeVideoPlayer';
+
+let YoutubeVideoPlayer: typeof YoutubeVideoPlayerType;
+const mockExec: jest.Mock<void, unknown[]> = jest.fn();
 
 jest.mock('cordova/exec', () => mockExec, { virtual: true });
 
 describe('YoutubeVideoPlayer', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.resetModules();
     mockExec.mockClear();
-    // Dynamically import the module to get fresh instance
-    YoutubeVideoPlayer = require('../plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/www/YoutubeVideoPlayer');
+    const mod = await import('../plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/www/YoutubeVideoPlayer');
+    YoutubeVideoPlayer = mod.default;
   });
 
   it('should export an object with openVideo method', () => {
@@ -29,33 +31,34 @@ describe('YoutubeVideoPlayer', () => {
   });
 
   it('should invoke success callback with "closed" when exec succeeds', async () => {
-    const callback = jest.fn();
     const promise = YoutubeVideoPlayer.openVideo('test123');
-    const successFn = mockExec.mock.calls[0][0];
+    const successFn = mockExec.mock.calls[0][0] as () => void;
     successFn();
     await expect(promise).resolves.toBe('closed');
   });
 
   it('should invoke error with "error" when exec fails', async () => {
     const promise = YoutubeVideoPlayer.openVideo('test123');
-    const errorFn = mockExec.mock.calls[0][1];
-    errorFn('some error');
+    const errorFn = mockExec.mock.calls[0][1] as () => void;
+    errorFn();
     await expect(promise).rejects.toBe('error');
   });
 
-  it('should handle openVideo without a callback', async () => {
+  it('should handle openVideo success and error callbacks gracefully', async () => {
     const promise = YoutubeVideoPlayer.openVideo('test123');
-    const successFn = mockExec.mock.calls[0][0];
+    const successFn = mockExec.mock.calls[0][0] as () => void;
     expect(() => successFn()).not.toThrow();
     await expect(promise).resolves.toBe('closed');
-    
-    const errorFn = mockExec.mock.calls[0][1];
-    expect(() => errorFn('err')).not.toThrow();
+
+    const promise2 = YoutubeVideoPlayer.openVideo('test456');
+    const errorFn2 = mockExec.mock.calls[1][1] as () => void;
+    expect(() => errorFn2()).not.toThrow();
+    await expect(promise2).rejects.toBe('error');
   });
 
-  it('should be a singleton instance', () => {
-    const mod = require('../plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/www/YoutubeVideoPlayer');
-    expect(mod).toBe(YoutubeVideoPlayer);
+  it('should be a singleton instance', async () => {
+    const mod = await import('../plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/www/YoutubeVideoPlayer');
+    expect(mod.default).toBe(YoutubeVideoPlayer);
   });
 
   it('should call exec with correct service and action names', () => {

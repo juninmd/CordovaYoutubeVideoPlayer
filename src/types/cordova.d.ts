@@ -2,12 +2,12 @@
 
 declare module 'cordova/exec' {
     function exec(
-        successCallback: (result: any) => void,
-        errorCallback: (error: any) => void,
+        successCallback: (result: unknown) => void,
+        errorCallback: (error: unknown) => void,
         service: string,
         action: string,
-        args?: any[]
+        args?: unknown[]
     ): void;
-    
+
     export default exec;
 }
