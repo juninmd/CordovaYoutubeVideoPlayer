@@ -7,8 +7,8 @@ const app = {
     },
     onDeviceReady: () => { },
     playVideo: () => {
-        YoutubeVideoPlayer.openVideo('npjF032TDDQ', (result) => {
-            console.log(`YoutubeVideoPlayer result = ${result}`);
+        YoutubeVideoPlayer.openVideo('npjF032TDDQ').then((result) => {
+            console.log('YoutubeVideoPlayer result = ' + result);
         });
     },
 };
