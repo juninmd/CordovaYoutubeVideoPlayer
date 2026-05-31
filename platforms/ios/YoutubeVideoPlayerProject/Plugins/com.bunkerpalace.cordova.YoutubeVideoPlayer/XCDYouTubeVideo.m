@@ -18,17 +18,20 @@ static NSRegularExpression *sLineBreakRegex;
 NSDictionary *XCDDictionaryWithQueryString(NSString *string, NSStringEncoding encoding)
 {
 	NSMutableDictionary *dictionary = [NSMutableDictionary new];
-	NSArray *fields = [string componentsSeparatedByString:@"&"];
-	for (NSString *field in fields)
+	NSScanner *scanner = [NSScanner scannerWithString:string];
+	scanner.charactersToBeSkipped = [NSCharacterSet characterSetWithCharactersInString:@""];
+	while (![scanner isAtEnd])
 	{
-		NSArray *pair = [field componentsSeparatedByString:@"="];
-		if (pair.count == 2)
+		NSString *key, *encodedValue;
+		if ([scanner scanUpToString:@"=" intoString:&key] && [scanner scanString:@"=" intoString:NULL] &&
+		    [scanner scanUpToString:@"&" intoString:&encodedValue])
 		{
-			NSString *key = pair[0];
-			NSString *value = [pair[1] stringByReplacingPercentEscapesUsingEncoding:encoding];
+			NSString *value = [encodedValue stringByReplacingPercentEscapesUsingEncoding:encoding];
 			value = [value stringByReplacingOccurrencesOfString:@"+" withString:@" "];
-			dictionary[key] = value;
+			if (key && value)
+				dictionary[key] = value;
 		}
+		[scanner scanString:@"&" intoString:NULL];
 	}
 	return [dictionary copy];
 }
@@ -41,10 +44,8 @@ static NSString *XCDURLEncodedStringUsingEncoding(NSString *string, NSStringEnco
 NSString *XCDQueryStringWithDictionary(NSDictionary *dictionary, NSStringEncoding encoding)
 {
 	NSMutableString *query = [NSMutableString new];
-	for (id key in dictionary)
+	for (NSString *key in dictionary)
 	{
-		if (![key isKindOfClass:[NSString class]])
-			continue;
 		if (query.length > 0)
 			[query appendString:@"&"];
 

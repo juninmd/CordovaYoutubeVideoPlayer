@@ -79,7 +79,14 @@ static const NSUInteger kEventLabelCount = 3;
 
 	if (!self.session)
 	{
-		self.session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+		static NSURLSessionConfiguration *sessionConfiguration;
+		static dispatch_once_t onceToken;
+		dispatch_once(&onceToken, ^{
+			sessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
+			sessionConfiguration.HTTPMaximumConnectionsPerHost = 6;
+			sessionConfiguration.timeoutIntervalForRequest = 10;
+		});
+		self.session = [NSURLSession sessionWithConfiguration:sessionConfiguration delegate:self delegateQueue:[NSOperationQueue mainQueue]];
 	}
 	self.dataTask = [self.session dataTaskWithRequest:request];
 	[self.dataTask resume];

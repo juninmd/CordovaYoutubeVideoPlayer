@@ -12,28 +12,18 @@
 
 - (void)openVideo:(CDVInvokedUrlCommand*)command
 {
-
-    CDVPluginResult* pluginResult = nil;
-    
     NSString* videoID = [command.arguments objectAtIndex:0];
-    
-    if (videoID != nil) {
-        
+
+    if ([videoID isKindOfClass:[NSString class]]) {
         XCDYouTubeVideoPlayerViewController *videoPlayerViewController = [[XCDYouTubeVideoPlayerViewController alloc] initWithVideoIdentifier:videoID];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(moviePlayerPlaybackDidFinish:) name:MPMoviePlayerPlaybackDidFinishNotification object:videoPlayerViewController.moviePlayer];
-        
+
         [self.viewController presentMoviePlayerViewControllerAnimated:videoPlayerViewController];
-        
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-        
+        _eventsCallbackId = command.callbackId;
     } else {
-        
-        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Missing videoID Argument"];
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Missing videoID Argument"];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-        
     }
-    
-    _eventsCallbackId = command.callbackId;
 }
 
 - (void) moviePlayerPlaybackDidFinish:(NSNotification *)notification
