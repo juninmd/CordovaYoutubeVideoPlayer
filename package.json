@@ -2,6 +2,7 @@
   "name": "com.bunkerpalace.cordova.YoutubeVideoPlayer",
   "version": "1.0.5",
   "description": "Play Youtube Videos in a native Video Player on Android & iOS.",
+  "type": "module",
   "cordova": {
     "id": "com.bunkerpalace.cordova.YoutubeVideoPlayer",
     "platforms": [

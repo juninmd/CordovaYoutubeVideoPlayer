@@ -3,15 +3,16 @@ const mockExec = jest.fn();
 
 jest.mock('cordova/exec', () => mockExec, { virtual: true });
 
-function loadModule() {
-  return require('../plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/www/YoutubeVideoPlayer').default;
+async function loadModule() {
+  const module = await import('../plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/www/YoutubeVideoPlayer');
+  return module.default;
 }
 
 describe('YoutubeVideoPlayer', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.resetModules();
     mockExec.mockClear();
-    YoutubeVideoPlayer = loadModule();
+    YoutubeVideoPlayer = await loadModule();
   });
 
   it('should export an object with openVideo method', () => {
@@ -55,8 +56,9 @@ describe('YoutubeVideoPlayer', () => {
     expect(() => errorFn('err')).not.toThrow();
   });
 
-  it('should be a singleton instance', () => {
-    expect(loadModule()).toBe(YoutubeVideoPlayer);
+  it('should be a singleton instance', async () => {
+    const secondInstance = await loadModule();
+    expect(secondInstance).toBe(YoutubeVideoPlayer);
   });
 
   it('should call exec with correct service and action names', () => {
