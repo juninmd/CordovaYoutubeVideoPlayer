@@ -102,12 +102,12 @@ public class YoutubeVideoPlayer extends CordovaPlugin {
 }
 
 	private boolean canResolvePlayVideoIntent(Context ctx) {
-    return canResolvePlayVideoIntent;
-}
+		return Boolean.TRUE.equals(canResolvePlayVideoIntent);
+	}
 
 	private boolean canResolvePlayVideoIntentWithOptions(Context ctx) {
-    return canResolvePlayVideoIntentWithOptions;
-}
+		return Boolean.TRUE.equals(canResolvePlayVideoIntentWithOptions);
+	}
 
 	private Intent createCustomYouTubeIntent(String videoId) {
 		Intent intent = new Intent(Intent.ACTION_VIEW,
@@ -124,6 +124,6 @@ public class YoutubeVideoPlayer extends CordovaPlugin {
 	}
 
 	private boolean isLollipopOrNewer() {
-    return isLollipopOrNewer;
-}
+		return Boolean.TRUE.equals(isLollipopOrNewer);
+	}
 }
