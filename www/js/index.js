@@ -5,10 +5,10 @@ const app = {
     bindEvents: () => {
         document.addEventListener('deviceready', app.onDeviceReady, false);
     },
-    onDeviceReady: () => { },
+    onDeviceReady: () => {},
     playVideo: () => {
         YoutubeVideoPlayer.openVideo('npjF032TDDQ').then((result) => {
-            console.log('YoutubeVideoPlayer result = ' + result);
+            console.log(`YoutubeVideoPlayer result = ${result}`);
         });
     },
 };

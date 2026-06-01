@@ -1,1 +1,1 @@
-{"version":3,"file":"YoutubeVideoPlayer.d.ts","sourceRoot":"","sources":["YoutubeVideoPlayer.ts"],"names":[],"mappings":";sBAGoB,MAAM,KAAG,OAAO,CAAC,MAAM,CAAC;;AAD5C,wBAYE"}
+{"version":3,"file":"YoutubeVideoPlayer.d.ts","sourceRoot":"","sources":["YoutubeVideoPlayer.ts"],"names":[],"mappings":"AAEA,UAAU,kBAAkB;IACxB,SAAS,EAAE,CAAC,IAAI,EAAE,MAAM,KAAK,OAAO,CAAC,MAAM,CAAC,CAAC;CAChD;wBAQI,kBAAkB;AANvB,wBAMwB"}

@@ -1,5 +1,5 @@
 module.exports = {
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/js-with-ts-esm',
   testEnvironment: 'node',
   testMatch: ['**/test/**/*.test.ts'],
   collectCoverageFrom: [

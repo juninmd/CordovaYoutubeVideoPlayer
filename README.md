@@ -30,6 +30,8 @@ cordova plugin add https://github.com/juninmd/CordovaYoutubeVideoPlayer
 
 ## Development Setup
 
+This project uses TypeScript. The source code is written in TypeScript and compiled to JavaScript.
+
 ```sh
 git clone <repo-url>
 cd CordovaYoutubeVideoPlayer
@@ -40,8 +42,30 @@ npm run lint
 
 ## Usage
 
+The plugin returns a Promise that resolves when the video is closed:
+
 ```javascript
-YoutubeVideoPlayer.openVideo('YOUTUBE_VIDEO_ID', function(result) { console.log('YoutubeVideoPlayer result = ' + result); });
+YoutubeVideoPlayer.openVideo('YOUTUBE_VIDEO_ID')
+  .then(result => console.log('YoutubeVideoPlayer result = ' + result))
+  .catch(error => console.error('Error:', error));
+```
+
+Or with async/await:
+
+```javascript
+try {
+  const result = await YoutubeVideoPlayer.openVideo('YOUTUBE_VIDEO_ID');
+  console.log('YoutubeVideoPlayer result = ' + result);
+} catch (error) {
+  console.error('Error:', error);
+}
+```
+
+For backward compatibility, you can still use the callback pattern:
+```javascript
+YoutubeVideoPlayer.openVideo('YOUTUBE_VIDEO_ID', function(result) { 
+  console.log('YoutubeVideoPlayer result = ' + result); 
+});
 ```
 
 For Android 5.0+ you will need to add the following to config.xml
