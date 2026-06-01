@@ -33,6 +33,12 @@ public class YoutubeVideoPlayer extends CordovaPlugin {
 		this.cachedContext = cordova.getActivity();
 		CordovaPreferences preferences = cordova.getActivity().getPreferences();
 		this.cachedApiKey = preferences.getString("YouTubeDataApiKey", "YOUTUBE_API_KEY");
+		
+		// Pre-calculate values that are used in openVideo to avoid lazy initialization delays
+		this.isLollipopOrNewer = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
+		this.canResolvePlayVideoIntent = YouTubeIntents.canResolvePlayVideoIntent(this.cachedContext);
+		this.canResolvePlayVideoIntentWithOptions = YouTubeIntents.canResolvePlayVideoIntentWithOptions(this.cachedContext);
+		this.youTubeVersion = YouTubeIntents.getInstalledYouTubeVersionName(this.cachedContext);
 	}
 
 	@Override
@@ -89,25 +95,19 @@ public class YoutubeVideoPlayer extends CordovaPlugin {
 	}
 
 	private String getYouTubeVersion() {
-		if (youTubeVersion == null) {
-   youTubeVersion = YouTubeIntents.getInstalledYouTubeVersionName(cordova.getActivity());
-		}
-		return youTubeVersion;
-	}
+    if (youTubeVersion == null) {
+        youTubeVersion = YouTubeIntents.getInstalledYouTubeVersionName(cachedContext);
+    }
+    return youTubeVersion;
+}
 
 	private boolean canResolvePlayVideoIntent(Context ctx) {
-		if (canResolvePlayVideoIntent == null) {
-			canResolvePlayVideoIntent = YouTubeIntents.canResolvePlayVideoIntent(ctx);
-		}
-		return canResolvePlayVideoIntent;
-	}
+    return canResolvePlayVideoIntent;
+}
 
 	private boolean canResolvePlayVideoIntentWithOptions(Context ctx) {
-		if (canResolvePlayVideoIntentWithOptions == null) {
-			canResolvePlayVideoIntentWithOptions = YouTubeIntents.canResolvePlayVideoIntentWithOptions(ctx);
-		}
-		return canResolvePlayVideoIntentWithOptions;
-	}
+    return canResolvePlayVideoIntentWithOptions;
+}
 
 	private Intent createCustomYouTubeIntent(String videoId) {
 		Intent intent = new Intent(Intent.ACTION_VIEW,
@@ -124,9 +124,6 @@ public class YoutubeVideoPlayer extends CordovaPlugin {
 	}
 
 	private boolean isLollipopOrNewer() {
-		if (isLollipopOrNewer == null) {
-			isLollipopOrNewer = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
-		}
-		return isLollipopOrNewer;
-	}
+    return isLollipopOrNewer;
+}
 }

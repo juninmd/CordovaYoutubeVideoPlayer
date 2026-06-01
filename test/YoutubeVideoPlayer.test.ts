@@ -4,6 +4,7 @@ const mockExec = jest.fn();
 jest.mock('cordova/exec', () => mockExec, { virtual: true });
 
 async function loadModule() {
+  // Using dynamic import to handle ES modules
   const module = await import('../plugins/com.bunkerpalace.cordova.YoutubeVideoPlayer/www/YoutubeVideoPlayer');
   return module.default;
 }
