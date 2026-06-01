@@ -1,5 +1,4 @@
 'use strict';
-Object.defineProperty(exports, '__esModule', { value: true });
 const app = {
   initialize: () => {
     app.bindEvents();
@@ -16,4 +15,3 @@ const app = {
 };
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', app.initialize);
-//# sourceMappingURL=index.js.map
